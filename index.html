@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anger Management Battle - Fun Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 1000px;
+            width: 95%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .battlefield {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .player {
+            flex: 1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .player-character {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1rem;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .player-character:hover {
+            transform: scale(1.05);
+        }
+
+        .character-face {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .boy .character-face {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .girl .character-face {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .emotion {
+            position: absolute;
+            font-size: 3rem;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .player-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .anger-meter-container {
+            margin: 1rem 0;
+        }
+
+        .anger-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .anger-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .anger-fill {
+            height: 100%;
+            transition: width 0.5s ease, background 0.3s ease;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .boy .anger-fill {
+            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+        }
+
+        .girl .anger-fill {
+            background: linear-gradient(90deg, #f5576c 0%, #f093fb 100%);
+        }
+
+        .hit-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        .hit-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .hit-button:active {
+            transform: scale(0.95);
+        }
+
+        .vs-text {
+            font-size: 3rem;
+            font-weight: bold;
+            opacity: 0.5;
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .game-over h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-over p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .hit-animation {
+            animation: shake 0.5s ease;
+        }
+
+        .happy-animation {
+            animation: bounce 0.6s ease;
+        }
+
+        .impact-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            animation: impact 0.5s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes impact {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+        .instructions {
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 15px;
+        }
+
+        .instructions p {
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .battlefield {
+                flex-direction: column;
+            }
+
+            .vs-text {
+                transform: rotate(90deg);
+            }
+
+            .player-character {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <h1>😤 Anger Management Battle 😤</h1>
+        <p class="subtitle">Hit each other to reduce anger! First to calm down wins!</p>
+
+        <div class="battlefield">
+            <!-- Boy Player -->
+            <div class="player boy">
+                <div class="player-character" onclick="hitPlayer('girl')" id="boyCharacter">
+                    <div class="character-face" id="boyFace">
+                        <span id="boyEmoji">🧑</span>
+                        <span class="emotion" id="boyEmotion">😤</span>
+                    </div>
+                </div>
+                <div class="player-name">Boy</div>
+                <div class="anger-meter-container">
+                    <div class="anger-label">
+                        <span>Anger Level</span>
+                        <span id="boyAngerValue">100%</span>
+                    </div>
+                    <div class="anger-bar">
+                        <div class="anger-fill" id="boyAngerBar" style="width: 100%;">😡</div>
+                    </div>
+                </div>
+                <button class="hit-button" onclick="hitPlayer('girl')">👊 Hit Girl</button>
+            </div>
+
+            <div class="vs-text">VS</div>
+
+            <!-- Girl Player -->
+            <div class="player girl">
+                <div class="player-character" onclick="hitPlayer('boy')" id="girlCharacter">
+                    <div class="character-face" id="girlFace">
+                        <span id="girlEmoji">👧</span>
+                        <span class="emotion" id="girlEmotion">😤</span>
+                    </div>
+                </div>
+                <div class="player-name">Girl</div>
+                <div class="anger-meter-container">
+                    <div class="anger-label">
+                        <span>Anger Level</span>
+                        <span id="girlAngerValue">100%</span>
+                    </div>
+                    <div class="anger-bar">
+                        <div class="anger-fill" id="girlAngerBar" style="width: 100%;">😡</div>
+                    </div>
+                </div>
+                <button class="hit-button" onclick="hitPlayer('boy')">👊 Hit Boy</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <p>🎮 <strong>How to Play:</strong></p>
+            <p>• Click on the opponent's character or button to hit them</p>
+            <p>• Each hit reduces their anger by 10-20%</p>
+            <p>• First player to reach 0% anger wins!</p>
+            <p>• Watch the animations and emotions change!</p>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2 id="winnerText">🎉 Winner! 🎉</h2>
+        <p id="winnerMessage"></p>
+        <button class="btn" onclick="resetGame()">Play Again</button>
+    </div>
+
+    <script>
+        let boyAnger = 100;
+        let girlAnger = 100;
+
+        const emotions = {
+            100: { emoji: '😡', text: 'Furious!' },
+            80: { emoji: '😤', text: 'Very Angry!' },
+            60: { emoji: '😠', text: 'Angry' },
+            40: { emoji: '😑', text: 'Annoyed' },
+            20: { emoji: '😐', text: 'Calming Down' },
+            0: { emoji: '😊', text: 'Calm & Happy' }
+        };
+
+        function getEmotion(anger) {
+            if (anger >= 80) return emotions[100];
+            if (anger >= 60) return emotions[80];
+            if (anger >= 40) return emotions[60];
+            if (anger >= 20) return emotions[40];
+            if (anger > 0) return emotions[20];
+            return emotions[0];
+        }
+
+        function updateDisplay(player) {
+            const anger = player === 'boy' ? boyAnger : girlAnger;
+            const emotion = getEmotion(anger);
+
+            // Update anger bar
+            document.getElementById(`${player}AngerBar`).style.width = anger + '%';
+            document.getElementById(`${player}AngerValue`).textContent = anger + '%';
+
+            // Update emotion
+            document.getElementById(`${player}Emotion`).textContent = emotion.emoji;
+
+            // Update bar emoji
+            if (anger > 0) {
+                document.getElementById(`${player}AngerBar`).textContent = emotion.emoji;
+            } else {
+                document.getElementById(`${player}AngerBar`).textContent = '🎉';
+            }
+        }
+
+        function createImpact(player, emoji) {
+            const character = document.getElementById(`${player}Character`);
+            const impact = document.createElement('div');
+            impact.className = 'impact-effect';
+            impact.textContent = emoji;
+            character.appendChild(impact);
+
+            setTimeout(() => {
+                impact.remove();
+            }, 500);
+        }
+
+        function hitPlayer(target) {
+            const targetAnger = target === 'boy' ? boyAnger : girlAnger;
+
+            if (targetAnger <= 0) {
+                return; // Can't hit someone who's already calm
+            }
+
+            // Reduce anger by random amount (10-20%)
+            const reduction = Math.floor(Math.random() * 11) + 10;
+
+            if (target === 'boy') {
+                boyAnger = Math.max(0, boyAnger - reduction);
+            } else {
+                girlAnger = Math.max(0, girlAnger - reduction);
+            }
+
+            // Animate the hit
+            const targetFace = document.getElementById(`${target}Face`);
+            targetFace.classList.add('hit-animation');
+
+            // Create impact effect
+            createImpact(target, '💥');
+
+            // Update display
+            updateDisplay(target);
+
+            // Remove animation class
+            setTimeout(() => {
+                targetFace.classList.remove('hit-animation');
+            }, 500);
+
+            // Check if game is over
+            if (boyAnger === 0 || girlAnger === 0) {
+                setTimeout(() => {
+                    endGame();
+                }, 1000);
+            }
+        }
+
+        function endGame() {
+            const winner = boyAnger === 0 ? 'Boy' : 'Girl';
+            const loser = boyAnger === 0 ? 'girl' : 'boy';
+
+            document.getElementById('winnerText').textContent = `🎉 ${winner} Wins! 🎉`;
+            document.getElementById('winnerMessage').textContent = `${winner} successfully calmed down and found inner peace!`;
+            document.getElementById('gameOver').style.display = 'block';
+
+            // Make winner happy
+            const winnerCharacter = document.getElementById(`${winner.toLowerCase()}Character`);
+            winnerCharacter.classList.add('happy-animation');
+        }
+
+        function resetGame() {
+            boyAnger = 100;
+            girlAnger = 100;
+
+            updateDisplay('boy');
+            updateDisplay('girl');
+
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('boyCharacter').classList.remove('happy-animation');
+            document.getElementById('girlCharacter').classList.remove('happy-animation');
+        }
+
+        // Initialize the game
+        updateDisplay('boy');
+        updateDisplay('girl');
+    </script>
+</body>
+
+</html>
